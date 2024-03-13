@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Filia Amoris - Daughter of Love</title>
+    <script type="text/javascript" src="https://ofrohn.github.io/lib/d3.min.js"></script>
+    <script type="text/javascript" src="https://ofrohn.github.io/lib/d3.geo.projection.min.js"></script>
+    <script type="text/javascript" src="https://ofrohn.github.io/celestial.min.js"></script>
+    <link rel="stylesheet" href="https://ofrohn.github.io/celestial.css" />
+</head>
+<body>
+
+<div id="page-content">
+    <div id="celestial-map"></div>
+</div>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        height: 100vh;
+        background: black;
+        overflow: auto;
+    }
+
+    #page-content {
+        position: relative;
+        height: 100%;
+        width: 100em;
+        max-width: 100%;
+        margin: auto;
+    }
+
+    #page-content img {
+        width: 100%;
+        display: block;
+    }
+
+    #celestial-map {
+        width: 100%;
+        height: 100%;
+        position: relative;
+    }
+</style>
+<script type="text/javascript">
+
+    Celestial.display({
+        disableAnimations: true,
+        controls: false,
+        interactive: true,
+        zoomlevel: 1,
+        datapath: "./data/",
+        stars: {
+            names: true,
+            propername: true,
+        },
+        planets: {
+            show: true,
+            names: true,
+            namesType: "la",
+        },
+        constellations: {
+            show: true,
+            names: true,
+            namesType: "la",
+        },
+        dsos: {
+            show: false
+        },
+        projection: "orthographic",
+        mw: { show: false },
+        lines: {
+            graticule: { show: false },
+            equatorial: { show: false },
+            ecliptic: { show: false },
+            galactic: { show: false },
+            supergalactic: { show: false }
+        }
+    });
+
+    let currentDate = new Date();
+    currentDate.setMonth(3);
+    let interval;
+    function run(increment, fps, delay) {
+        if (interval) {
+            clearInterval(interval);
+        }
+
+        // Default location is Glacier National Park
+        Celestial.location([48.398336, -114.3406592]);
+
+        // Try to get real location if available
+        navigator.geolocation.getCurrentPosition((position) => {
+            let lat = position.coords.latitude;
+            let lng = position.coords.longitude;
+            Celestial.location([lat, lng]);
+        });
+
+        if (increment > 0) {
+            // Start the interval after an initial delay to let the map fully load
+            setTimeout(() => {
+                interval = setInterval(() => {
+                    currentDate = new Date(currentDate.getTime() + (increment * 3600 * 1000));
+                    Celestial.date(currentDate);
+                }, 1000 / (fps || 60));
+            }, (delay || 3000));
+        }
+    }
+    run();
+</script>
+</body>
+</html>
